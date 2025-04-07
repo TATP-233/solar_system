@@ -13,6 +13,7 @@ find_package(Freetype REQUIRED)
 set(SOURCES
     src/main.cpp
     src/text_renderer.cpp
+    src/stb_image_impl.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

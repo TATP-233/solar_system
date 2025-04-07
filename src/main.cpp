@@ -13,8 +13,8 @@
 
 #include "../include/text_renderer.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+// 只包含stb_image.h头文件，实现部分在stb_image_impl.cpp中
+#include "../include/stb_image.h"
 
 // 窗口尺寸
 const unsigned int SCR_WIDTH = 1280;
