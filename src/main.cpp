@@ -17,8 +17,8 @@
 #include "stb_image.h"
 
 // 窗口尺寸
-const unsigned int SCR_WIDTH = 1200;
-const unsigned int SCR_HEIGHT = 800;
+const unsigned int SCR_WIDTH = 1280;
+const unsigned int SCR_HEIGHT = 720;
 
 // 自转与公转速度
 float rotationSpeed = 1.0f;
@@ -241,14 +241,14 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
     }
     
     float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // 反转y，因为y坐标是从底部往顶部增加的
+    float yoffset = ypos - lastY;
     lastX = xpos;
     lastY = ypos;
     
     // 左键按下：旋转视角
     if (leftMousePressed) {
-        float rotX = yoffset * mouseSpeed * 0.01f;
-        float rotY = xoffset * mouseSpeed * 0.01f;
+        float rotX = -yoffset * mouseSpeed * 0.01f;
+        float rotY = -xoffset * mouseSpeed * 0.01f;
         
         // 计算相机到目标的方向向量
         glm::vec3 direction = normalize(cameraPos - cameraTarget);
@@ -273,10 +273,10 @@ void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
         
         // 计算相机右向量和上向量
         glm::vec3 right = normalize(cross(cameraUp, direction));
-        glm::vec3 up = cameraUp;
+        glm::vec3 up = cross(direction, right);
         
         // 计算平移量
-        glm::vec3 pan = -right * xoffset * mouseSpeed * 0.05f + up * yoffset * mouseSpeed * 0.05f;
+        glm::vec3 pan = (-right * xoffset * mouseSpeed + up * yoffset * mouseSpeed) * 0.25f * cameraZoom / 45.0f;
         
         // 应用平移
         cameraPos += pan;
@@ -821,7 +821,12 @@ int main() {
     // 存储行星位置
     std::vector<glm::vec3> planetPositions(planets.size());
     glm::vec3 moonPosition;
-    
+
+    // 设置光照参数
+    glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);  // 光源在太阳的位置
+    glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    float ambientStrength = 0.3f;
+
     // 渲染循环
     while (!glfwWindowShouldClose(window)) {
         // 清空颜色和深度缓冲
@@ -838,12 +843,7 @@ int main() {
         // 更新相机视图矩阵
         glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
         glm::mat4 projection = glm::perspective(glm::radians(cameraZoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 1000.0f);
-        
-        // 设置光照参数
-        glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 0.0f);  // 光源在太阳的位置
-        glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-        float ambientStrength = 0.3f;
-        
+                
         // 设置着色器全局变量
         glUseProgram(shaderProgram);
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
