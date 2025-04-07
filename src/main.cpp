@@ -13,8 +13,8 @@
 
 #include "../include/text_renderer.h"
 
-// 只包含stb_image.h头文件，实现部分在stb_image_impl.cpp中
-#include "../include/stb_image.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 // 窗口尺寸
 const unsigned int SCR_WIDTH = 1280;
@@ -28,13 +28,13 @@ float orbitSpeed = 0.5f;
 glm::vec3 cameraPos = glm::vec3(0.0f, 100.0f, 230.0f);
 glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-float cameraZoom = 45.0f;
+float cameraZoom = 15.0f;
 
 // 默认相机参数（用于重置）
 const glm::vec3 DEFAULT_CAMERA_POS = glm::vec3(0.0f, 100.0f, 230.0f);
 const glm::vec3 DEFAULT_CAMERA_TARGET = glm::vec3(0.0f, 0.0f, 0.0f);
 const glm::vec3 DEFAULT_CAMERA_UP = glm::vec3(0.0f, 1.0f, 0.0f);
-const float DEFAULT_CAMERA_ZOOM = 45.0f;
+const float DEFAULT_CAMERA_ZOOM = 15.0f;
 
 // 鼠标控制参数
 bool firstMouse = true;
@@ -309,8 +309,8 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
     // 限制缩放范围
     if (cameraZoom < 1.0f)
         cameraZoom = 1.0f;
-    if (cameraZoom > 90.0f)
-        cameraZoom = 90.0f;
+    if (cameraZoom > 25.0f)
+        cameraZoom = 25.0f;
 }
 
 // 更新所有行星速度
@@ -686,7 +686,7 @@ int main() {
     Planet mercury;
     mercury.name = "Mercury";
     mercury.radius = 0.6f;  // 增大水星半径
-    mercury.distance = 5.0f;
+    mercury.distance = 4.5f;
     mercury.baseOrbitSpeed = 4.7f;
     mercury.baseRotationSpeed = 0.017f;
     mercury.orbitSpeed = mercury.baseOrbitSpeed * orbitSpeed;
@@ -701,7 +701,7 @@ int main() {
     Planet venus;
     venus.name = "Venus";
     venus.radius = 1.2f;   // 增大金星半径
-    venus.distance = 9.0f;
+    venus.distance = 6.0f;
     venus.baseOrbitSpeed = 3.5f;
     venus.baseRotationSpeed = 0.004f;
     venus.orbitSpeed = venus.baseOrbitSpeed * orbitSpeed;
@@ -716,7 +716,7 @@ int main() {
     Planet earth;
     earth.name = "Earth";
     earth.radius = 1.3f;   // 增大地球半径
-    earth.distance = 12.0f;
+    earth.distance = 9.0f;
     earth.baseOrbitSpeed = 3.0f;
     earth.baseRotationSpeed = 1.0f;
     earth.orbitSpeed = earth.baseOrbitSpeed * orbitSpeed;
@@ -744,7 +744,7 @@ int main() {
     Planet mars;
     mars.name = "Mars";
     mars.radius = 0.7f;    // 增大火星半径
-    mars.distance = 18.0f;
+    mars.distance = 12.0f;
     mars.baseOrbitSpeed = 2.4f;
     mars.baseRotationSpeed = 0.97f;
     mars.orbitSpeed = mars.baseOrbitSpeed * orbitSpeed;
@@ -759,7 +759,7 @@ int main() {
     Planet jupiter;
     jupiter.name = "Jupiter";
     jupiter.radius = 2.5f;   // 增大木星半径
-    jupiter.distance = 60.0f;
+    jupiter.distance = 15.0f;
     jupiter.baseOrbitSpeed = 1.3f;
     jupiter.baseRotationSpeed = 2.4f;
     jupiter.orbitSpeed = jupiter.baseOrbitSpeed * orbitSpeed;
@@ -774,7 +774,7 @@ int main() {
     Planet saturn;
     saturn.name = "Saturn";
     saturn.radius = 2.3f;    // 增大土星半径
-    saturn.distance = 100.0f;
+    saturn.distance = 25.0f;
     saturn.baseOrbitSpeed = 0.97f;
     saturn.baseRotationSpeed = 2.2f;
     saturn.orbitSpeed = saturn.baseOrbitSpeed * orbitSpeed;
@@ -789,7 +789,7 @@ int main() {
     Planet uranus;
     uranus.name = "Uranus";
     uranus.radius = 1.8f;    // 增大天王星半径
-    uranus.distance = 180.0f;
+    uranus.distance = 35.0f;
     uranus.baseOrbitSpeed = 0.68f;
     uranus.baseRotationSpeed = 1.4f;
     uranus.orbitSpeed = uranus.baseOrbitSpeed * orbitSpeed;
@@ -804,7 +804,7 @@ int main() {
     Planet neptune;
     neptune.name = "Neptune";
     neptune.radius = 1.8f;    // 增大海王星半径
-    neptune.distance = 230.0f;
+    neptune.distance = 45.0f;
     neptune.baseOrbitSpeed = 0.54f;
     neptune.baseRotationSpeed = 1.5f;
     neptune.orbitSpeed = neptune.baseOrbitSpeed * orbitSpeed;
@@ -830,7 +830,7 @@ int main() {
     // 渲染循环
     while (!glfwWindowShouldClose(window)) {
         // 清空颜色和深度缓冲
-        glClearColor(0.0f, 0.0f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // 如果需要切换字体
