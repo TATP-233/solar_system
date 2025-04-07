@@ -123,7 +123,7 @@ void generateSphere(std::vector<float>& vertices, std::vector<float>& normals,
             normals.push_back(ny);
             normals.push_back(nz);
 
-            // 顶点纹理坐标 (s, t) 范围在[0, 1]
+            // 顶点纹理坐标 (s, t) 范围在[0, 1            // 水平方向s保持不变，垂直方向t需要反向以使纹理上下对应球体南北极
             s = (float)j / sectors;
             t = (float)i / stacks;
             texCoords.push_back(s);
@@ -701,7 +701,7 @@ int main() {
     Planet venus;
     venus.name = "Venus";
     venus.radius = 1.2f;   // 增大金星半径
-    venus.distance = 6.0f;
+    venus.distance = 7.0f;
     venus.baseOrbitSpeed = 3.5f;
     venus.baseRotationSpeed = 0.004f;
     venus.orbitSpeed = venus.baseOrbitSpeed * orbitSpeed;
@@ -716,7 +716,7 @@ int main() {
     Planet earth;
     earth.name = "Earth";
     earth.radius = 1.3f;   // 增大地球半径
-    earth.distance = 9.0f;
+    earth.distance = 10.75f;
     earth.baseOrbitSpeed = 3.0f;
     earth.baseRotationSpeed = 1.0f;
     earth.orbitSpeed = earth.baseOrbitSpeed * orbitSpeed;
@@ -729,8 +729,8 @@ int main() {
     
     // 月球 (增大半径)
     moon.name = "Moon";
-    moon.radius = 0.4f;    // 增大月球半径
-    moon.distance = 2.5f;  // 相对于地球的距离
+    moon.radius = 0.3f;    // 增大月球半径
+    moon.distance = 2.f;  // 相对于地球的距离
     moon.baseOrbitSpeed = 13.0f;
     moon.baseRotationSpeed = 0.1f;
     moon.orbitSpeed = moon.baseOrbitSpeed * orbitSpeed;
@@ -744,7 +744,7 @@ int main() {
     Planet mars;
     mars.name = "Mars";
     mars.radius = 0.7f;    // 增大火星半径
-    mars.distance = 12.0f;
+    mars.distance = 15.0f;
     mars.baseOrbitSpeed = 2.4f;
     mars.baseRotationSpeed = 0.97f;
     mars.orbitSpeed = mars.baseOrbitSpeed * orbitSpeed;
@@ -759,7 +759,7 @@ int main() {
     Planet jupiter;
     jupiter.name = "Jupiter";
     jupiter.radius = 2.5f;   // 增大木星半径
-    jupiter.distance = 15.0f;
+    jupiter.distance = 19.0f;
     jupiter.baseOrbitSpeed = 1.3f;
     jupiter.baseRotationSpeed = 2.4f;
     jupiter.orbitSpeed = jupiter.baseOrbitSpeed * orbitSpeed;
@@ -865,6 +865,7 @@ int main() {
             // 进行公转
             model = glm::rotate(model, planets[i].currentOrbitAngle, glm::vec3(0.0f, 1.0f, 0.0f));
             model = glm::translate(model, glm::vec3(planets[i].distance, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             
             // 保存未旋转的行星位置（用于显示名称和绘制轨迹）
             planetPositions[i] = glm::vec3(model[3]);
@@ -875,14 +876,17 @@ int main() {
             }
             
             // 进行自转
-            model = glm::rotate(model, glm::radians(planets[i].tilt), glm::vec3(0.0f, 0.0f, 1.0f));
-            model = glm::rotate(model, planets[i].currentRotationAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(planets[i].tilt), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, planets[i].currentRotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
             
             // 设置行星大小
             model = glm::scale(model, glm::vec3(planets[i].radius));
             
             // 传递模型矩阵到着色器
             glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+            
+            // 设置isSun标志，太阳(i=0)为true，其他行星为false
+            glUniform1i(glGetUniformLocation(shaderProgram, "isSun"), i == 0 ? 1 : 0);
             
             // 绑定纹理
             glActiveTexture(GL_TEXTURE0);
@@ -903,6 +907,7 @@ int main() {
                 // 月球围绕地球旋转
                 moonModel = glm::rotate(moonModel, moon.currentOrbitAngle, glm::vec3(0.0f, 1.0f, 0.0f));
                 moonModel = glm::translate(moonModel, glm::vec3(moon.distance, 0.0f, 0.0f));
+                moonModel = glm::rotate(moonModel, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
                 
                 // 保存月球位置（用于显示名称和绘制轨迹）
                 moonPosition = glm::vec3(moonModel[3]);
@@ -911,7 +916,7 @@ int main() {
                 addTrailPoint(moon, moonPosition);
                 
                 // 月球自转
-                moonModel = glm::rotate(moonModel, glm::radians(moon.tilt), glm::vec3(0.0f, 0.0f, 1.0f));
+                moonModel = glm::rotate(moonModel, glm::radians(moon.tilt), glm::vec3(1.0f, 0.0f, 0.0f));
                 moonModel = glm::rotate(moonModel, moon.currentRotationAngle, glm::vec3(0.0f, 1.0f, 0.0f));
                 
                 // 设置月球大小
@@ -919,6 +924,9 @@ int main() {
                 
                 // 传递模型矩阵到着色器
                 glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(moonModel));
+                
+                // 设置isSun为false（月球不是太阳）
+                glUniform1i(glGetUniformLocation(shaderProgram, "isSun"), 0);
                 
                 // 绑定月球纹理
                 glActiveTexture(GL_TEXTURE0);
